@@ -23,6 +23,8 @@ module Stateflow
       klass._previous_state = current_state.name.to_s
       new_state.execute_action(:enter, klass)
 
+      machine.after_any_block.call(klass) if machine.after_any_block
+
       klass.set_current_state(new_state, options)
       true
     end
