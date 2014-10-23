@@ -147,16 +147,22 @@ class Any
 
   stateflow do
     initial :one
-    state :one, :two, :three, :four
+    state :one, :two, :three
     event :increment do
       transitions :from => :one,   :to => :two
       transitions :from => :two,   :to => :three
-      transitions :from => :three, :to => :four
+    end
+    event :nothing do
+      transitions :from => [:one, :two, :three], :to => :one, :if => :nope
     end
 
     after_any do |object|
       object.current_state_name = object.current_state.name
     end
+  end
+
+  def nope
+    false
   end
 end
 
@@ -415,6 +421,12 @@ describe Stateflow do
       any.increment
 
       any.current_state_name.should == :two
+
+      any.current_state_name = nil
+
+      any.nothing
+
+      any.current_state_name.should == nil
     end
   end
 end
