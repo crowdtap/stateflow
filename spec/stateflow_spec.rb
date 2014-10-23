@@ -140,6 +140,26 @@ class Excepting
   end
 end
 
+class Any
+  include Stateflow
+
+  attr_accessor :current_state_name
+
+  stateflow do
+    initial :one
+    state :one, :two, :three, :four
+    event :increment do
+      transitions :from => :one,   :to => :two
+      transitions :from => :two,   :to => :three
+      transitions :from => :three, :to => :four
+    end
+
+    after_any do |object|
+      object.current_state_name = object.current_state.name
+    end
+  end
+end
+
 describe Stateflow do
   describe "class methods" do
     it "should respond to stateflow block to setup the intial stateflow" do
@@ -383,5 +403,18 @@ describe Stateflow do
     subject { proc { Excepting.new.fail } }
 
     it { should raise_error(/Don't know how to fail when in state working./) }
+  end
+
+  describe 'binding to any state change' do
+    it 'should bind to each state change' do
+      any = Any.new
+      any.increment
+
+      any.current_state_name.should == :one
+
+      any.increment
+
+      any.current_state_name.should == :two
+    end
   end
 end

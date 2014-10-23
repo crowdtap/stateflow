@@ -1,6 +1,6 @@
 module Stateflow
   class Machine
-    attr_accessor :states, :initial_state, :events
+    attr_accessor :states, :initial_state, :events, :after_any_block
 
     def initialize(&machine)
       @states, @events, @create_scopes = Hash.new, Hash.new, true
@@ -35,6 +35,10 @@ module Stateflow
     def event(name, &transitions)
       event = Stateflow::Event.new(name, self, &transitions)
       @events[name.to_sym] = event
+    end
+
+    def after_any(&block)
+      @after_any_block = block
     end
   end
 end
